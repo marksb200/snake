@@ -5,23 +5,31 @@ import random
 _width = 800
 _height = 600
 segSize = 20
+theBigApple = 50
 gameStatus = True
-
+counter = 0
+if counter > 5:
+    counter = 0
 
 # Helper functions
 def apple():
     """ Creates an apple to be eaten """
     global appleGlob
+    global counter
     posx = segSize * random.randint(1, (_width-segSize) / segSize)
     posy = segSize * random.randint(1, (_height-segSize) / segSize)
     appleGlob = canvas.create_oval(posx, posy,
                           posx+segSize, posy+segSize,
                           fill="red")
-
+    if counter == 5:
+        appleGlob = canvas.create_oval(posx, posy,
+                          posx+theBigApple, posy+theBigApple,
+                          fill="red")    
 
 def main():
     """ Handles game process """
     global gameStatus
+    global counter
     if gameStatus:
         current_snake.move()
         head_coords = canvas.coords(current_snake.segments[-1].create)
@@ -34,6 +42,10 @@ def main():
             current_snake.add_segment()
             canvas.delete(appleGlob)
             apple()
+            counter+=1
+            if counter == 5:
+                current_snake.add_segment()
+                current_snake.add_segment()
         # Self-eating
         else:
             for index in range(len(current_snake.segments)-1):
