@@ -44,7 +44,7 @@ def main():
             current_snake.add_segment()
             canvas.delete(appleGlobBig)
             #appleMonster()
-            root.after(1000000, appleMonster) 
+            root.after(50000, appleMonster) 
         # Self-eating
         else:
             for index in range(len(current_snake.segments)-1):
