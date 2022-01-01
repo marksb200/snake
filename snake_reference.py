@@ -1,35 +1,32 @@
 from tkinter import Tk, Canvas
 import random
+import time 
 
 # Globals Parametrs
 _width = 800
 _height = 600
 segSize = 20
-theBigApple = 50
 gameStatus = True
-counter = 0
-if counter > 5:
-    counter = 0
-
 # Helper functions
 def apple():
     """ Creates an apple to be eaten """
-    global appleGlob
-    global counter
+    global appleGlobSmall
     posx = segSize * random.randint(1, (_width-segSize) / segSize)
     posy = segSize * random.randint(1, (_height-segSize) / segSize)
-    appleGlob = canvas.create_oval(posx, posy,
+    appleGlobSmall = canvas.create_oval(posx, posy,
                           posx+segSize, posy+segSize,
                           fill="red")
-    if counter == 5:
-        appleGlob = canvas.create_oval(posx, posy,
-                          posx+theBigApple, posy+theBigApple,
-                          fill="red")    
-
+     
+def appleMonster():                          
+    global appleGlobBig
+    _posx = segSize * random.randint(1, (_width-segSize) / segSize)
+    _posy = segSize * random.randint(1, (_height-segSize) / segSize)                      
+    appleGlobBig = canvas.create_oval(_posx, _posy,
+                          _posx+segSize, _posy+segSize,
+                          fill="black")                                             
 def main():
     """ Handles game process """
     global gameStatus
-    global counter
     if gameStatus:
         current_snake.move()
         head_coords = canvas.coords(current_snake.segments[-1].create)
@@ -38,14 +35,16 @@ def main():
         if x2 > _width or x1 < 0 or y1 < 0 or y2 > _height:
             gameStatus = False
         # Eating apples
-        elif head_coords == canvas.coords(appleGlob):
+        elif head_coords == canvas.coords(appleGlobSmall):
             current_snake.add_segment()
-            canvas.delete(appleGlob)
+            canvas.delete(appleGlobSmall)
             apple()
-            counter+=1
-            if counter == 5:
-                current_snake.add_segment()
-                current_snake.add_segment()
+        elif head_coords == canvas.coords(appleGlobBig):
+            current_snake.add_segment()
+            current_snake.add_segment()
+            canvas.delete(appleGlobBig)
+            #appleMonster()
+            root.after(1000000, appleMonster) 
         # Self-eating
         else:
             for index in range(len(current_snake.segments)-1):
@@ -113,7 +112,8 @@ def clicked(event):
     global gameStatus
     current_snake.reset_snake()
     gameStatus = True
-    canvas.delete(appleGlob)
+    canvas.delete(appleGlobSmall)
+    canvas.delete(appleGlobBig)
     canvas.itemconfigure(restart_text, state='hidden')
     canvas.itemconfigure(game_over_text, state='hidden')
     start_game()
@@ -122,6 +122,7 @@ def clicked(event):
 def start_game():
     global current_snake
     apple()
+    appleMonster()
     current_snake = create_snake()
     # Reaction on keypress
     canvas.bind("<KeyPress>", current_snake.change_direction)
